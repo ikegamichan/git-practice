@@ -1,25 +1,25 @@
-import { useState } from "react";
-
 type SelectboxProps = {
-  options: string[];
+  options: { id: string; label: string }[];
+  onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  value: string;
+  content: string;
 };
 
-export const Selectbox = ({ options }: SelectboxProps) => {
-  const [prefectures, setPrefectures] = useState<string[]>([]);
-
-  const changePrefectures = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const prefectureValue = event.target.value;
-    setPrefectures([prefectureValue]);
-  };
+export const Selectbox = ({
+  options,
+  value,
+  onChange,
+  content,
+}: SelectboxProps) => {
   return (
-    <select value={prefectures} onChange={changePrefectures}>
+    <select value={value} onChange={onChange}>
       <option value="" disabled>
-        --都道府県を選択してください--
+        --{content}を選択してください--
       </option>
-      {options.map((option, index) => {
+      {options.map((option) => {
         return (
-          <option key={index} value={option}>
-            {option}
+          <option key={option.id} value={option.id}>
+            {option.label}
           </option>
         );
       })}

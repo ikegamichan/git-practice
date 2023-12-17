@@ -2,7 +2,7 @@ import { DropDownItem } from "@/stories/DropDownItem";
 
 type DropDownMenuProps = {
   id: string;
-  dropDownText: string;
+  dropDownText?: string;
   dorpDownLists: { value: string; detail: string }[];
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 };
