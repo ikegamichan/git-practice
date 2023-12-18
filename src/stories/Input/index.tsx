@@ -1,14 +1,16 @@
 import { InputWrapper } from "@/stories/Input/style";
 
 type InputProps = {
+  type: string;
   width: string;
   padding: string;
   height: string;
-  value?: string;
+  value: string;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 export const Input = ({
+  type,
   width,
   padding,
   height,
@@ -17,7 +19,7 @@ export const Input = ({
 }: InputProps) => {
   return (
     <InputWrapper
-      type="text"
+      type={type}
       value={value}
       width={width}
       padding={padding}
