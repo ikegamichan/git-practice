@@ -42,17 +42,7 @@ export const UserRegistration = () => {
       label: "",
     },
   });
-  const [birthday, setBirthday] = useState("");
-  const [sex, setSex] = useState("");
   const [prefectures, setPrefectures] = useState<PrefecturesData[]>([]); //
-  const [prefectureValue, setPrefecturesValue] = useState("");
-
-  // console.log(text);
-  // console.log(birthday);
-  // console.log(mail);
-  // console.log(sex);
-  // console.log(prefectureValue);
-  // console.log(user);
 
   // 都道府県一覧を取得
   useEffect(() => {
@@ -62,14 +52,13 @@ export const UserRegistration = () => {
         headers: { "X-API-KEY": "7OuyZcldkSqrjebk1uY4q5P4upADMoS69nPw9aei" },
       })
       .then((res) => {
-        console.log(res.data.result, "qqqq");
         const newPrefectures = res.data.result.map(
-          (r: { prefCode: number; prefName: string }) => ({
-            id: r.prefCode,
+          (r: { prefCode: string; prefName: string }) => ({
+            id: r.prefCode.toString(),
             label: r.prefName,
           })
         );
-        console.log(newPrefectures, "3333");
+
         setPrefectures(newPrefectures);
       })
       .catch((err) => {
@@ -77,32 +66,51 @@ export const UserRegistration = () => {
       });
   }, []);
 
-  const changePrefectures = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const prefectureValue = event.target.value;
-    // console.log(prefectureValue);
-    setPrefecturesValue(prefectureValue);
-  };
-
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLInputElement>,
     key: string
   ) => {
     const value = e.target.value;
     setUser((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleChange2 = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-    key: string
-  ) => {
-    const value = e.target.value;
-    const id = e.target;
-    console.log("id:", id);
-    console.log("value:", value);
+  /* ここがわからなかった1(多重構造のオブジェクトのid,labelの値を抽出する方法) */
 
-    // setUser((prev) => ({ ...prev, [key]:{id:id,label:value}  }));
+  const handleChangeBirthday = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const getBirthday = e.target.value;
+    setUser((prev) => ({ ...prev, birthday: new Date(getBirthday) }));
   };
-  console.log(user);
+
+  const handleChangeSex = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedId = e.target.value.toString();
+    const selectedSex = sexList.find((item) => item.id === selectedId);
+
+    if (selectedSex) {
+      setUser((prev) => ({
+        ...prev,
+        sex: {
+          id: selectedSex.id,
+          label: selectedSex.label,
+        },
+      }));
+    }
+  };
+
+  const handleChangePrefectures = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedPrefecture = prefectures.find(
+      (item) => item.id === e.target.value
+    );
+
+    if (selectedPrefecture) {
+      setUser((prev) => ({
+        ...prev,
+        prefectures: {
+          id: selectedPrefecture.id,
+          label: selectedPrefecture.label,
+        },
+      }));
+    }
+  };
 
   return (
     <>
@@ -119,15 +127,13 @@ export const UserRegistration = () => {
       </div>
       <div>
         <h2>性別</h2>
-        {/* Selectbox */}
         <Selectbox
           options={sexList}
-          onChange={(e) => handleChange2(e, "sex")}
-          value={user.sex.label}
+          onChange={(e) => handleChangeSex(e)}
+          value={user.sex.id}
           content="性別"
         />
       </div>
-      {/* ここがわからなかった */}
       <div>
         <h2>生年月日</h2>
         <Input
@@ -135,8 +141,8 @@ export const UserRegistration = () => {
           width="300px"
           padding="10px"
           height="30px"
-          value={birthday}
-          onChange={(e) => setBirthday(e.target.value)}
+          value={user.birthday?.toISOString().slice(0, 10) ?? ""}
+          onChange={(e) => handleChangeBirthday(e)}
         />
       </div>
       <div>
@@ -155,8 +161,8 @@ export const UserRegistration = () => {
       </div>
       <Selectbox
         options={prefectures}
-        onChange={changePrefectures}
-        value={prefectureValue}
+        onChange={(e) => handleChangePrefectures(e)}
+        value={user.prefectures.id}
         content="都道府県"
       />
     </>
